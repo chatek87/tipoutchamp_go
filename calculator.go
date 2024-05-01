@@ -65,7 +65,10 @@ func (c *Calculator) CopyInputIntoOutput() {
 
 	// support
 	if c.SupportIn != nil {
-
+		for i, support := range c.SupportIn {
+			c.SupportOut[i].Name = support.Name
+			c.SupportOut[i].Hours = support.Hours
+		}
 	}
 }
 
