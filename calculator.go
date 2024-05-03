@@ -12,6 +12,9 @@ type Calculator struct {
 	ServersOut []ServerOut
 	EventsOut  []EventOut
 	SupportOut []SupportOut
+
+	BarPool     float64
+	SupportPool float64
 }
 
 func (c *Calculator) RunCalculationsPopulateOutputFields() {
@@ -23,9 +26,34 @@ func (c *Calculator) RunCalculationsPopulateOutputFields() {
 	supportTipoutPercentage, supportCount := c.getTipoutPercentageToSupport()
 
 	// get total hours for bartenders/support
-	barHours := c.getTotalBarHours()
-	supportHours := c.getTotalSupportHours()
+	totalBarHours := c.getTotalBarHours()
+	totalSupportHours := c.getTotalSupportHours()
 
+	// bar
+	if c.SupportOut != nil {
+		// calculate tipout to support
+		toSupport := c.BarTeamOut.Sales * supportTipoutPercentage
+		// record it in field
+		c.BarTeamOut.TipoutToSupport = toSupport
+		// add it to the support pool running tally
+		c.SupportPool += toSupport
+		// subtract it from the final payout
+		c.BarTeamOut.FinalPayout = c.BarTeamOut.OwedToPreTipout - toSupport
+		// vv kind of a redundant field now, but could be useful should tipout rules change
+		c.BarTeamOut.TotalAmountTippedOut = c.BarTeamOut.TipoutToSupport
+	}
+
+	if c.BarTeamOut.Bartenders != nil {
+		for _, bartender := range c.BarTeamOut.Bartenders {
+			bartender.PercentageOfBarTipPool = bartender.Hours / totalBarHours
+
+			// calculate final payout etc...
+		}
+	}
+
+	// servers
+	// events
+	// support
 	// go thru each server, calculating tipout to bar and support, recording that value in the corresponding Out fields
 	// subtract the calculated tipout from the OwedTo field to get the FinalPayout, record that value
 	// add the calculated tipout to a running tally of total tip pool for

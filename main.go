@@ -1,5 +1,9 @@
 package main
 
+func main() {
+print("hi")
+}
+
 func seedSampleData() {
 	// Define sample data for employees
 	barTeamIn := BarTeamIn{
@@ -75,7 +79,5 @@ func seedSampleData() {
 		SupportIn: supportIn,
 	}
 
-	// Optionally, call methods on the Calculator instance
-	// For example, to run calculations and populate output fields
-	// calc.RunCalculationsPopulateOutputFields()
+	calc.RunCalculationsPopulateOutputFields()
 }
