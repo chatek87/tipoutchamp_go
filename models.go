@@ -32,8 +32,9 @@ type SupportIn struct {
 
 // output models ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 type BartenderOut struct {
-	Name                   string
-	Hours                  float64
+	Name  string
+	Hours float64
+	// calculated...
 	PercentageOfBarTipPool float64
 	OwedToPreTipout        float64
 	TipoutToSupport        float64
@@ -42,18 +43,20 @@ type BartenderOut struct {
 }
 
 type BarTeamOut struct {
-	Bartenders           []BartenderOut
-	OwedToPreTipout      float64
-	Sales                float64
+	Bartenders      []BartenderOut
+	OwedToPreTipout float64
+	Sales           float64
+	// calculated...
 	TipoutToSupport      float64
 	TotalAmountTippedOut float64
 	FinalPayout          float64
 }
 
 type ServerOut struct {
-	Name                 string
-	OwedToPreTipout      float64
-	Sales                float64
+	Name            string
+	OwedToPreTipout float64
+	Sales           float64
+	// calculated...
 	TipoutToBar          float64
 	TipoutToSupport      float64
 	TotalAmountTippedOut float64
@@ -61,20 +64,22 @@ type ServerOut struct {
 }
 
 type EventOut struct {
-	Name                 string
-	OwedToPreTipout      float64
-	Sales                float64
+	Name            string
+	OwedToPreTipout float64
+	Sales           float64
+	SplitBy         int // the number of workers splitting the final payout
+	// calculated...
 	TipoutToBar          float64
 	TipoutToSupport      float64
 	TotalAmountTippedOut float64
 	FinalPayout          float64
-	SplitBy              int // the number of workers splitting the final payout
 	FinalPayoutPerWorker float64
 }
 
 type SupportOut struct {
-	Name                       string
-	Hours                      float64
+	Name  string
+	Hours float64
+	// calculated...
 	PercentageOfSupportTipPool float64
 	TipoutFromBar              float64
 	TipoutFromServers          float64

@@ -13,54 +13,85 @@ type Calculator struct {
 	EventsOut  []EventOut
 	SupportOut []SupportOut
 
-	BarPool     float64
-	SupportPool float64
+	// fields needed for calculations
+	BarPool             float64
+	TotalBarHours       float64
+	BarCount            int
+	BarTipoutPercentage float64
+
+	SupportPool             float64
+	TotalSupportHours       float64
+	SupportCount            int
+	SupportTipoutPercentage float64
 }
 
 func (c *Calculator) RunCalculationsPopulateOutputFields() {
-	// copy all input fields into output model fields
-	c.CopyInputIntoOutput()
-
-	// determine tipout percentages and counts for bar and support
-	barTipoutPercentage, barCount := c.getTipoutPercentageToBar()
-	supportTipoutPercentage, supportCount := c.getTipoutPercentageToSupport()
-
-	// get total hours for bartenders/support
-	totalBarHours := c.getTotalBarHours()
-	totalSupportHours := c.getTotalSupportHours()
-
-	// bar
-	if c.SupportOut != nil {
-		// calculate tipout to support
-		toSupport := c.BarTeamOut.Sales * supportTipoutPercentage
-		// record it in field
-		c.BarTeamOut.TipoutToSupport = toSupport
-		// add it to the support pool running tally
-		c.SupportPool += toSupport
-		// subtract it from the final payout
-		c.BarTeamOut.FinalPayout = c.BarTeamOut.OwedToPreTipout - toSupport
-		// vv kind of a redundant field now, but could be useful should tipout rules change
-		c.BarTeamOut.TotalAmountTippedOut = c.BarTeamOut.TipoutToSupport
-	}
-
-	if c.BarTeamOut.Bartenders != nil {
-		for _, bartender := range c.BarTeamOut.Bartenders {
-			bartender.PercentageOfBarTipPool = bartender.Hours / totalBarHours
-
-			// calculate final payout etc...
-		}
-	}
-
-	// servers
-	// events
-	// support
-	// go thru each server, calculating tipout to bar and support, recording that value in the corresponding Out fields
-	// subtract the calculated tipout from the OwedTo field to get the FinalPayout, record that value
-	// add the calculated tipout to a running tally of total tip pool for
+	c.copyInputIntoOutput()
+	c.getTipoutPercentages()
+	c.tallyTipPools()
+	c.distributeTipoutsGetFinalPayouts()
 }
 
 // helper funcs
-func (c *Calculator) CopyInputIntoOutput() {
+func (c *Calculator) getTipoutPercentages() {
+	// determine tipout percentages and counts for bar and support
+	c.BarTipoutPercentage, c.BarCount = c.getTipoutPercentageToBar()
+	c.SupportTipoutPercentage, c.SupportCount = c.getTipoutPercentageToSupport()
+
+	// get total hours for bartenders/support
+	c.TotalBarHours = c.getTotalBarHours()
+	c.TotalSupportHours = c.getTotalSupportHours()
+
+}
+
+func (c *Calculator) distributeTipoutsGetFinalPayouts() {
+	if c.BarTeamOut.Bartenders != nil {
+		for _, bartender := range c.BarTeamOut.Bartenders {
+			bartender.PercentageOfBarTipPool = bartender.Hours / c.TotalBarHours
+			bartender.OwedToPreTipout = c.BarTeamOut.OwedToPreTipout * bartender.PercentageOfBarTipPool
+			bartender.TipoutToSupport = c.BarTeamOut.TipoutToSupport * bartender.PercentageOfBarTipPool
+			bartender.TotalAmountTippedOut = bartender.TipoutToSupport
+		}
+	}
+}
+
+func (c *Calculator) tallyTipPools() {
+	// bar pool
+	//servers
+	for _, server := range c.ServersOut {
+		server.TipoutToBar = server.Sales * c.BarTipoutPercentage
+		c.BarPool += server.TipoutToBar
+	}
+	//events
+	for _, event := range c.ServersOut {
+		event.TipoutToBar = event.Sales * c.BarTipoutPercentage
+		c.BarPool += event.TipoutToBar
+	}
+
+	// support pool
+	if c.SupportOut != nil {
+		//bar
+		// calculate tipout to support and record in field
+		c.BarTeamOut.TipoutToSupport = c.BarTeamOut.Sales * c.SupportTipoutPercentage
+		// add it to the support pool running tally
+		c.SupportPool += c.BarTeamOut.TipoutToSupport
+		// vv kind of a redundant field now, but could be useful should tipout rules change
+		c.BarTeamOut.TotalAmountTippedOut = c.BarTeamOut.TipoutToSupport
+
+		//servers
+		for _, server := range c.ServersOut {
+			server.TipoutToSupport = server.Sales * c.SupportTipoutPercentage
+			c.SupportPool += server.TipoutToSupport
+		}
+		//events
+		for _, event := range c.EventsOut {
+			event.TipoutToSupport = event.Sales * c.SupportTipoutPercentage
+			c.SupportPool += event.TipoutToSupport
+		}
+	}
+}
+
+func (c *Calculator) copyInputIntoOutput() {
 	// bar
 	c.BarTeamOut.OwedToPreTipout = c.BarTeamIn.OwedTo
 	c.BarTeamOut.Sales = c.BarTeamIn.Sales
