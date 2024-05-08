@@ -39,6 +39,9 @@ type BartenderOut struct {
 	OwedToPreTipout        float64
 	TipoutToSupport        float64
 	TotalAmountTippedOut   float64
+	TipoutFromServers      float64
+	TipoutFromEvents       float64
+	TotalTipoutReceived    float64
 	FinalPayout            float64
 }
 
@@ -49,6 +52,9 @@ type BarTeamOut struct {
 	// calculated...
 	TipoutToSupport      float64
 	TotalAmountTippedOut float64
+	TipoutFromServers    float64
+	TipoutFromEvents     float64
+	TotalTipoutReceived  float64
 	FinalPayout          float64
 }
 
