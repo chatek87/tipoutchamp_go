@@ -118,6 +118,12 @@ func (c *Calculator) tallyTipPools() {
 }
 
 func (c *Calculator) copyInputIntoOutput() {
+	// initialize output slices w/ same length as input slices
+	c.BarTeamOut.Bartenders = make([]BartenderOut, len(c.BarTeamIn.Bartenders))
+	c.ServersOut = make([]ServerOut, len(c.ServersIn))
+	c.EventsOut = make([]EventOut, len(c.EventsIn))
+	c.SupportOut = make([]SupportOut, len(c.SupportIn))
+	
 	// bar
 	c.BarTeamOut.OwedToPreTipout = c.BarTeamIn.OwedTo
 	c.BarTeamOut.Sales = c.BarTeamIn.Sales
