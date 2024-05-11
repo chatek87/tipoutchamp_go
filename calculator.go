@@ -103,11 +103,14 @@ func (c *Calculator) tallyTipPools() {
 		c.BarTeamOut.TipoutFromServers += server.TipoutToBar
 	}
 	// from events
-	for _, event := range c.ServersOut {
+	for i := range c.EventsOut {
+		event := &c.EventsOut[i]
 		event.TipoutToBar = event.Sales * c.BarTipoutPercentage
 		c.BarPool += event.TipoutToBar
 		c.BarTeamOut.TipoutFromEvents += event.TipoutToBar
 	}
+
+	c.BarTeamOut.TotalTipoutReceived = c.BarTeamOut.TipoutFromServers + c.BarTeamOut.TipoutFromEvents
 
 	// support pool
 	if c.SupportOut != nil {
@@ -156,17 +159,25 @@ func (c *Calculator) distributeTipoutsGetFinalPayouts() {
 		}
 	}
 	// servers
-	for _, server := range c.ServersOut {
+	for i := range c.ServersOut {
+		server := &c.ServersOut[i]
 		server.TotalAmountTippedOut = server.TipoutToBar + server.TipoutToSupport
 		server.FinalPayout = server.OwedToPreTipout - server.TotalAmountTippedOut
 	}
 	// events
-	for _, event := range c.EventsOut {
+	for i := range c.EventsOut {
+		event := &c.EventsOut[i]
 		event.TotalAmountTippedOut = event.TipoutToBar + event.TipoutToSupport
 		event.FinalPayout = event.OwedToPreTipout - event.TotalAmountTippedOut
+		event.FinalPayoutPerWorker = event.FinalPayout / float64(event.SplitBy)
 	}
 	// support
-	for _, support := range c.SupportOut {
+	for i := range c.SupportOut {
+		support := &c.SupportOut[i]
+		support.PercentageOfSupportTipPool = support.Hours / c.TotalSupportHours
+		support.TipoutFromBar = c.ToSupportFromBarAmount * support.PercentageOfSupportTipPool
+		support.TipoutFromServers = c.ToSupportFromServersAmount * support.PercentageOfSupportTipPool
+		support.TipoutFromEvents = c.ToSupportFromEventsAmount * support.PercentageOfSupportTipPool
 		support.FinalPayout = c.SupportPool * support.PercentageOfSupportTipPool
 	}
 }
