@@ -52,6 +52,7 @@ func seedSampleData() {
 		// Populate with sample data
 		{
 			Name:    "Event 1",
+			OwedTo:  600.00,
 			Sales:   3000.00,
 			SplitBy: 2,
 		},
