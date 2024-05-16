@@ -13,16 +13,17 @@ type Calculator struct {
 	EventsOut  []EventOut
 	SupportOut []SupportOut
 
-	// tip pool info fields needed for calculations
-	BarPool             float64
-	TotalBarHours       float64
-	BarCount            int
-	BarTipoutPercentage float64
-
-	SupportPool             float64
-	TotalSupportHours       float64
+	// configuration fields
+	BarCount                int
 	SupportCount            int
+	TotalBarHours           float64
+	TotalSupportHours       float64
+	BarTipoutPercentage     float64
 	SupportTipoutPercentage float64
+	
+	// tip pool-related fields
+	BarPool     float64
+	SupportPool float64
 
 	ToSupportFromBarAmount     float64
 	ToSupportFromServersAmount float64
@@ -31,7 +32,7 @@ type Calculator struct {
 
 func (c *Calculator) RunCalculationsPopulateOutputFields() {
 	c.copyInputIntoOutput()
-	c.getTipoutPercentagesAndPoolInfo()
+	c.setConfigurationFields()
 	c.tallyTipPools()
 	c.distributeTipoutsGetFinalPayouts()
 }
@@ -83,14 +84,48 @@ func (c *Calculator) copyInputIntoOutput() {
 	}
 }
 
-func (c *Calculator) getTipoutPercentagesAndPoolInfo() {
-	// determine tipout percentages and counts for bar and support
-	c.BarTipoutPercentage, c.BarCount = c.getTipoutPercentageToBar()
-	c.SupportTipoutPercentage, c.SupportCount = c.getTipoutPercentageToSupport()
-
-	// get total hours for bartenders/support
-	c.TotalBarHours = c.getTotalBarHours()
-	c.TotalSupportHours = c.getTotalSupportHours()
+func (c *Calculator) setConfigurationFields() {
+	// counts
+	c.BarCount = len(c.BarTeamIn.Bartenders)
+	c.SupportCount = len(c.SupportIn)
+	// tipout %'s
+	c.setBarTipoutPercentage()
+	c.setSupportTipoutPercentage()
+	// hours
+	c.setTotalBarHours()
+	c.setTotalSupportHours()
+}
+func (c *Calculator) setTotalBarHours() {
+	totalHours := 0.0
+	for _, bartender := range c.BarTeamIn.Bartenders {
+		totalHours += bartender.Hours
+	}
+	c.TotalBarHours = totalHours
+}
+func (c *Calculator) setTotalSupportHours() {
+	totalHours := 0.0
+	for _, support := range c.SupportIn {
+		totalHours += support.Hours
+	}
+}
+func (c *Calculator) setBarTipoutPercentage() {
+	count := len(c.SupportIn)
+	if count >= 3 {
+		c.BarTipoutPercentage = 0.015
+	} else {
+		c.BarTipoutPercentage = 0.02
+	}
+}
+func (c *Calculator) setSupportTipoutPercentage() {
+	count := len(c.SupportIn)
+	if count == 0 {
+		c.SupportTipoutPercentage = 0.00
+	}
+	if count <= 3 {
+		c.SupportTipoutPercentage = float64(count) * 0.01
+	} else {
+		c.SupportTipoutPercentage = 0.03
+	}
 }
 
 func (c *Calculator) tallyTipPools() {
@@ -180,47 +215,4 @@ func (c *Calculator) distributeTipoutsGetFinalPayouts() {
 		support.TipoutFromEvents = c.ToSupportFromEventsAmount * support.PercentageOfSupportTipPool
 		support.FinalPayout = c.SupportPool * support.PercentageOfSupportTipPool
 	}
-}
-
-func (c *Calculator) getTotalBarHours() float64 {
-	totalHours := 0.0
-	for _, bartender := range c.BarTeamIn.Bartenders {
-		totalHours += bartender.Hours
-	}
-	return totalHours
-}
-
-func (c *Calculator) getTotalSupportHours() float64 {
-	totalHours := 0.0
-	for _, support := range c.SupportIn {
-		totalHours += support.Hours
-	}
-	return totalHours
-}
-
-func (c *Calculator) getTipoutPercentageToBar() (float64, int) {
-	count := len(c.BarTeamIn.Bartenders)
-	var percentage float64
-	if count == 0 {
-		percentage = 0.00
-	} else if count >= 3 {
-		percentage = 0.015
-	} else {
-		percentage = 0.02
-	}
-	return percentage, count
-}
-
-func (c *Calculator) getTipoutPercentageToSupport() (float64, int) {
-	count := len(c.SupportIn)
-	var percentage float64
-	if count == 0 {
-		percentage = 0.00
-	}
-	if count <= 3 {
-		percentage = float64(count) * 0.01
-	} else {
-		percentage = 0.03
-	}
-	return percentage, count
 }
