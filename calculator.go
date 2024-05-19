@@ -20,7 +20,7 @@ type Calculator struct {
 	TotalSupportHours       float64
 	BarTipoutPercentage     float64
 	SupportTipoutPercentage float64
-	
+
 	// tip pool-related fields
 	BarPool     float64
 	SupportPool float64
@@ -37,14 +37,13 @@ func (c *Calculator) RunCalculationsPopulateOutputFields() {
 	c.distributeTipoutsGetFinalPayouts()
 }
 
-// helper methods
+// helpers to RunCalculationsPopulateOutputFields()
 func (c *Calculator) copyInputIntoOutput() {
 	// initialize output slices w/ same length as input slices
 	c.BarTeamOut.Bartenders = make([]BartenderOut, len(c.BarTeamIn.Bartenders))
 	c.ServersOut = make([]ServerOut, len(c.ServersIn))
 	c.EventsOut = make([]EventOut, len(c.EventsIn))
 	c.SupportOut = make([]SupportOut, len(c.SupportIn))
-
 	// bar
 	c.BarTeamOut.OwedToPreTipout = c.BarTeamIn.OwedTo
 	c.BarTeamOut.Sales = c.BarTeamIn.Sales
@@ -55,7 +54,6 @@ func (c *Calculator) copyInputIntoOutput() {
 			c.BarTeamOut.Bartenders[i].Hours = bartender.Hours
 		}
 	}
-
 	// servers
 	if c.ServersIn != nil {
 		for i, server := range c.ServersIn {
@@ -64,7 +62,6 @@ func (c *Calculator) copyInputIntoOutput() {
 			c.ServersOut[i].OwedToPreTipout = server.OwedTo
 		}
 	}
-
 	// events
 	if c.EventsIn != nil {
 		for i, event := range c.EventsIn {
@@ -74,7 +71,6 @@ func (c *Calculator) copyInputIntoOutput() {
 			c.EventsOut[i].SplitBy = event.SplitBy
 		}
 	}
-
 	// support
 	if c.SupportIn != nil {
 		for i, support := range c.SupportIn {
@@ -83,7 +79,6 @@ func (c *Calculator) copyInputIntoOutput() {
 		}
 	}
 }
-
 func (c *Calculator) setConfigurationFields() {
 	// counts
 	c.BarCount = len(c.BarTeamIn.Bartenders)
@@ -107,6 +102,7 @@ func (c *Calculator) setTotalSupportHours() {
 	for _, support := range c.SupportIn {
 		totalHours += support.Hours
 	}
+	c.TotalSupportHours = totalHours
 }
 func (c *Calculator) setBarTipoutPercentage() {
 	count := len(c.SupportIn)
@@ -127,7 +123,6 @@ func (c *Calculator) setSupportTipoutPercentage() {
 		c.SupportTipoutPercentage = 0.03
 	}
 }
-
 func (c *Calculator) tallyTipPools() {
 	// bar pool
 	// from servers
@@ -174,7 +169,6 @@ func (c *Calculator) tallyTipPools() {
 		}
 	}
 }
-
 func (c *Calculator) distributeTipoutsGetFinalPayouts() {
 	// bar team
 	c.BarTeamOut.FinalPayout = c.BarTeamOut.OwedToPreTipout - c.BarTeamOut.TotalAmountTippedOut + c.BarPool
@@ -216,3 +210,12 @@ func (c *Calculator) distributeTipoutsGetFinalPayouts() {
 		support.FinalPayout = c.SupportPool * support.PercentageOfSupportTipPool
 	}
 }
+
+// report related
+// func (c *Calculator) GenerateReport() {
+
+// }
+
+// func (c *Calculator) SaveJSONToFile() {
+
+// }

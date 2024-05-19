@@ -83,38 +83,26 @@ func TestGetTipoutPercentageToBarAndToSupport(t *testing.T) {
 		// setup necessary fields
 		c.copyInputIntoOutput()
 		c.setConfigurationFields()
-		// check bar
-		if c.SupportCount == 0 && c.BarTipoutPercentage != 0.02 {
-			t.Errorf("BarTipoutPercentage expected: 0.02 got: %f", c.SupportTipoutPercentage)
-		} else if c.SupportCount == 1 && c.BarTipoutPercentage != 0.01 {
-			t.Errorf("SupportTipoutPercentage expected: 0.01 got: %f", c.SupportTipoutPercentage)
-		} else if c.SupportCount == 2 && c.BarTipoutPercentage != 0.02 {
-			t.Errorf("SupportTipoutPercentage expected: 0.02 got: %f", c.SupportTipoutPercentage)
-		} else if c.SupportCount == 3 && c.BarTipoutPercentage != 0.03 {
-			t.Errorf("SupportTipoutPercentage expected: 0.03 got: %f", c.SupportTipoutPercentage)
-		} else if c.SupportCount > 3 && c.BarTipoutPercentage != 0.03 {
-			t.Errorf("SupportTipoutPercentage expected: 0.03 got: %f", c.SupportTipoutPercentage)
+		// check bar tipout percentage
+		if c.SupportCount >= 3 && c.BarTipoutPercentage != 0.015 {
+			t.Errorf("BarTipoutPercentage expected: 0.015 got: %f", c.BarTipoutPercentage)
+		} else if c.SupportCount < 3 && c.BarTipoutPercentage != 0.02 {
+			t.Errorf("BarTipoutPercentage expected: 0.015 got: %f", c.BarTipoutPercentage)
 		}
-		// check support
-		if c.SupportCount == 0 && c.SupportTipoutPercentage != 0 {
+		// check support tipout percentage
+		if c.SupportCount == 0 && c.SupportTipoutPercentage != 0.00 {
 			t.Errorf("SupportTipoutPercentage expected: 0.00 got: %f", c.SupportTipoutPercentage)
 		} else if c.SupportCount == 1 && c.SupportTipoutPercentage != 0.01 {
 			t.Errorf("SupportTipoutPercentage expected: 0.01 got: %f", c.SupportTipoutPercentage)
 		} else if c.SupportCount == 2 && c.SupportTipoutPercentage != 0.02 {
 			t.Errorf("SupportTipoutPercentage expected: 0.02 got: %f", c.SupportTipoutPercentage)
-		} else if c.SupportCount == 3 && c.SupportTipoutPercentage != 0.03 {
-			t.Errorf("SupportTipoutPercentage expected: 0.03 got: %f", c.SupportTipoutPercentage)
-		} else if c.SupportCount > 3 && c.SupportTipoutPercentage != 0.03 {
+		} else if c.SupportCount >= 3 && c.SupportTipoutPercentage != 0.03 {
 			t.Errorf("SupportTipoutPercentage expected: 0.03 got: %f", c.SupportTipoutPercentage)
 		}
 	}
 }
 
-// func TestGetTipoutPercentageToSupport(t *testing.T) {
-// 	c := testSetup()
-
-// }
-
+// helper funcs
 func testSetup() Calculator {
 	calc := Calculator{
 		BarTeamIn: BarTeamIn{Bartenders: []BartenderIn{{Name: "Bartender 1", Hours: 6.0}, {Name: "Bartender 2", Hours: 8.0}}, OwedTo: 400.00, Sales: 2000.00},
