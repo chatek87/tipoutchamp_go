@@ -279,7 +279,7 @@ func (c *Calculator) GenerateReport() {
 	fmt.Printf("\n")
 }
 
-func (c *Calculator) seedSampleData() {
+func (c *Calculator) SeedSampleData() {
 	// Define sample data for employees
 	c.BarTeamIn = BarTeamIn{Bartenders: []BartenderIn{{Name: "Bartender 1", Hours: 6.0}, {Name: "Bartender 2", Hours: 8.0}}, OwedTo: 400.00, Sales: 2000.00}
 	c.ServersIn = []ServerIn{{Name: "Server 1", OwedTo: 100.00, Sales: 500.00}, {Name: "Server 2", OwedTo: 200.00, Sales: 1000.00}, {Name: "Server 3", OwedTo: 300.00, Sales: 1500.00}, {Name: "Server 4", OwedTo: 400.00, Sales: 2000.00}}
