@@ -15,7 +15,6 @@ type D = layout.Dimensions
 
 
 func loop(w *app.Window) error {
-	th := material.NewTheme()
 	var ops op.Ops
 	// UI elements
 	var addBartenderBtn widget.Clickable
