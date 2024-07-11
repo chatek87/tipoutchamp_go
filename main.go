@@ -5,21 +5,31 @@ import (
 	"os"
 
 	"gioui.org/app"
+	"gioui.org/layout"
 	"gioui.org/unit"
-	"gioui.org/widget/material"
 )
 
+type C = layout.Context
+type D = layout.Dimensions
+
+type ViewState int	
+
+const (
+	MainView ViewState = iota
+	BartenderInputView
+)
+
+var currentState ViewState = MainView
 var calc *Calculator
-var th *material.Theme
 
 func main() {
 	calc = new(Calculator)
-	th = material.NewTheme()
+	calc.SeedSampleData()
 
 	go func() {
 		w := new(app.Window)
-		w.Option(app.Title("tipout champ"), app.Size(unit.Dp(400), unit.Dp(600)))
-		
+		w.Option(app.Title("TipOut Champ"), app.Size(unit.Dp(400), unit.Dp(600)))
+
 		if err := loop(w); err != nil {
 			log.Fatal(err)
 		}
