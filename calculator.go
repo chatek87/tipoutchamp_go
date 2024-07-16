@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 type Calculator struct {
 	// input fields
@@ -33,6 +36,7 @@ type Calculator struct {
 }
 
 func (c *Calculator) RunCalculationsPopulateOutputFields() {
+	c.clearOutput()
 	c.copyInputIntoOutput()
 	c.setConfigurationFields()
 	c.tallyTipPools()
@@ -40,6 +44,20 @@ func (c *Calculator) RunCalculationsPopulateOutputFields() {
 }
 
 // helpers to RunCalculationsPopulateOutputFields()
+func (c *Calculator) clearOutput() {
+	c.BarTeamOut = BarTeamOut{
+		Bartenders:           []BartenderOut{},
+		OwedToPreTipout:      0.0,
+		Sales:                0.0,
+		TipoutToSupport:      0.0,
+		TotalAmountTippedOut: 0.0,
+	}
+
+	c.ServersOut = []ServerOut{}
+	c.EventsOut = []EventOut{}
+	c.SupportOut = []SupportOut{}
+}
+
 func (c *Calculator) copyInputIntoOutput() {
 	// initialize output slices w/ same length as input slices
 	c.BarTeamOut.Bartenders = make([]BartenderOut, len(c.BarTeamIn.Bartenders))
@@ -214,69 +232,118 @@ func (c *Calculator) distributeTipoutsGetFinalPayouts() {
 }
 
 // report related
-func (c *Calculator) GenerateReport() {
-	fmt.Printf("TIPOUT REPORT\n")
-	fmt.Printf("\n")
-	fmt.Printf("BAR TEAM\n")
-	fmt.Printf("OWED TO PRE TIPOUT: %.2f\n", c.BarTeamOut.OwedToPreTipout)
-	fmt.Printf("SALES: %.2f\n", c.BarTeamOut.Sales)
-	fmt.Printf("TIPOUT TO SUPPORT: %.2f\n", c.BarTeamOut.TipoutToSupport)
-	fmt.Printf("TOTAL AMOUNT TIPPED OUT: %.2f\n", c.BarTeamOut.TotalAmountTippedOut)
-	fmt.Printf("TIPOUT FROM SERVERS: %.2f\n", c.BarTeamOut.TipoutFromServers)
-	fmt.Printf("TIPOUT FROM EVENTS: %.2f\n", c.BarTeamOut.TipoutFromEvents)
-	fmt.Printf("TOTAL TIPOUT RECEIVED: %.2f\n", c.BarTeamOut.TotalTipoutReceived)
-	fmt.Printf("FINAL PAYOUT: %.2f\n", c.BarTeamOut.FinalPayout)
-	fmt.Printf("INDIVIDUAL BARTENDERS\n")
-	fmt.Printf("\n")
+func (c *Calculator) GenerateReport() string {
+	var sb strings.Builder
+
+	sb.WriteString("TIPOUT REPORT\n")
+	sb.WriteString("\n")
+	sb.WriteString("BAR TEAM\n")
+	sb.WriteString(fmt.Sprintf("OWED TO PRE TIPOUT: %.2f\n", c.BarTeamOut.OwedToPreTipout))
+	sb.WriteString(fmt.Sprintf("SALES: %.2f\n", c.BarTeamOut.Sales))
+	sb.WriteString(fmt.Sprintf("TIPOUT TO SUPPORT: %.2f\n", c.BarTeamOut.TipoutToSupport))
+	sb.WriteString(fmt.Sprintf("TOTAL AMOUNT TIPPED OUT: %.2f\n", c.BarTeamOut.TotalAmountTippedOut))
+	sb.WriteString(fmt.Sprintf("TIPOUT FROM SERVERS: %.2f\n", c.BarTeamOut.TipoutFromServers))
+	sb.WriteString(fmt.Sprintf("TIPOUT FROM EVENTS: %.2f\n", c.BarTeamOut.TipoutFromEvents))
+	sb.WriteString(fmt.Sprintf("TOTAL TIPOUT RECEIVED: %.2f\n", c.BarTeamOut.TotalTipoutReceived))
+	sb.WriteString(fmt.Sprintf("FINAL PAYOUT: %.2f\n", c.BarTeamOut.FinalPayout))
+	sb.WriteString("INDIVIDUAL BARTENDERS\n")
+	sb.WriteString("\n")
+
 	for _, b := range c.BarTeamOut.Bartenders {
-		fmt.Printf("BARTENDER NAME: %s\n", b.Name)
-		fmt.Printf("HOURS: %.2f\n", b.Hours)
-		fmt.Printf("%% OF BAR TIP POOL: %.2f\n", b.PercentageOfBarTipPool)
-		fmt.Printf("OWED TO PRE TIPOUT: %.2f\n", b.OwedToPreTipout)
-		fmt.Printf("TIPOUT TO SUPPORT: %.2f\n", b.TipoutToSupport)
-		fmt.Printf("TOTAL AMOUNT TIPPED OUT: %.2f\n", b.TotalAmountTippedOut)
-		fmt.Printf("TIPOUT FROM SERVERS: %.2f\n", b.TipoutFromServers)
-		fmt.Printf("TIPOUT FROM EVENTS: %.2f\n", b.TipoutFromEvents)
-		fmt.Printf("TOTAL TIPOUT RECEIVED: %.2f\n", b.TotalTipoutReceived)
-		fmt.Printf("FINAL PAYOUT: %.2f\n", b.FinalPayout)
-		fmt.Printf("\n")
+		sb.WriteString(fmt.Sprintf("BARTENDER NAME: %s\n", b.Name))
+		sb.WriteString(fmt.Sprintf("HOURS: %.2f\n", b.Hours))
+		sb.WriteString(fmt.Sprintf("%% OF BAR TIP POOL: %.2f\n", b.PercentageOfBarTipPool))
+		sb.WriteString(fmt.Sprintf("OWED TO PRE TIPOUT: %.2f\n", b.OwedToPreTipout))
+		sb.WriteString(fmt.Sprintf("TIPOUT TO SUPPORT: %.2f\n", b.TipoutToSupport))
+		sb.WriteString(fmt.Sprintf("TOTAL AMOUNT TIPPED OUT: %.2f\n", b.TotalAmountTippedOut))
+		sb.WriteString(fmt.Sprintf("TIPOUT FROM SERVERS: %.2f\n", b.TipoutFromServers))
+		sb.WriteString(fmt.Sprintf("TIPOUT FROM EVENTS: %.2f\n", b.TipoutFromEvents))
+		sb.WriteString(fmt.Sprintf("TOTAL TIPOUT RECEIVED: %.2f\n", b.TotalTipoutReceived))
+		sb.WriteString(fmt.Sprintf("FINAL PAYOUT: %.2f\n", b.FinalPayout))
+		sb.WriteString("\n")
 	}
-	fmt.Printf("SERVERS\n")
+
+	sb.WriteString("SERVERS\n")
 	for _, s := range c.ServersOut {
-		fmt.Printf("SERVER NAME: %s\n", s.Name)
-		fmt.Printf("OWED TO PRE TIPOUT: %.2f\n", s.OwedToPreTipout)
-		fmt.Printf("SALES: %.2f\n", s.Sales)
-		fmt.Printf("TIPOUT TO BAR: %.2f\n", s.TipoutToBar)
-		fmt.Printf("TIPOUT TO SUPPORT: %.2f\n", s.TipoutToSupport)
-		fmt.Printf("TOTAL AMOUNT TIPPED OUT: %.2f\n", s.TotalAmountTippedOut)
-		fmt.Printf("FINAL PAYOUT: %.2f\n", s.FinalPayout)
-		fmt.Printf("\n")
+		sb.WriteString(fmt.Sprintf("SERVER NAME: %s\n", s.Name))
+		sb.WriteString(fmt.Sprintf("OWED TO PRE TIPOUT: %.2f\n", s.OwedToPreTipout))
+		sb.WriteString(fmt.Sprintf("SALES: %.2f\n", s.Sales))
+		sb.WriteString(fmt.Sprintf("TIPOUT TO BAR: %.2f\n", s.TipoutToBar))
+		sb.WriteString(fmt.Sprintf("TIPOUT TO SUPPORT: %.2f\n", s.TipoutToSupport))
+		sb.WriteString(fmt.Sprintf("TOTAL AMOUNT TIPPED OUT: %.2f\n", s.TotalAmountTippedOut))
+		sb.WriteString(fmt.Sprintf("FINAL PAYOUT: %.2f\n", s.FinalPayout))
+		sb.WriteString("\n")
 	}
-	fmt.Printf("EVENTS\n")
+
+	sb.WriteString("EVENTS\n")
 	for _, e := range c.EventsOut {
-		fmt.Printf("EVENT NAME: %s\n", e.Name)
-		fmt.Printf("OWED TO PRE TIPOUT: %.2f\n", e.OwedToPreTipout)
-		fmt.Printf("SALES: %.2f\n", e.Sales)
-		fmt.Printf("SPLIT BY: %d\n", e.SplitBy)
-		fmt.Printf("TIPOUT TO BAR: %.2f\n", e.TipoutToBar)
-		fmt.Printf("TIPOUT TO SUPPORT: %.2f\n", e.TipoutToSupport)
-		fmt.Printf("TOTAL AMOUNT TIPPED OUT: %.2f\n", e.TotalAmountTippedOut)
-		fmt.Printf("FINAL PAYOUT: %.2f\n", e.FinalPayout)
-		fmt.Printf("FINAL PAYOUT PER WORKER: %.2f\n", e.FinalPayoutPerWorker)
-		fmt.Printf("\n")
+		sb.WriteString(fmt.Sprintf("EVENT NAME: %s\n", e.Name))
+		sb.WriteString(fmt.Sprintf("OWED TO PRE TIPOUT: %.2f\n", e.OwedToPreTipout))
+		sb.WriteString(fmt.Sprintf("SALES: %.2f\n", e.Sales))
+		sb.WriteString(fmt.Sprintf("SPLIT BY: %d\n", e.SplitBy))
+		sb.WriteString(fmt.Sprintf("TIPOUT TO BAR: %.2f\n", e.TipoutToBar))
+		sb.WriteString(fmt.Sprintf("TIPOUT TO SUPPORT: %.2f\n", e.TipoutToSupport))
+		sb.WriteString(fmt.Sprintf("TOTAL AMOUNT TIPPED OUT: %.2f\n", e.TotalAmountTippedOut))
+		sb.WriteString(fmt.Sprintf("FINAL PAYOUT: %.2f\n", e.FinalPayout))
+		sb.WriteString(fmt.Sprintf("FINAL PAYOUT PER WORKER: %.2f\n", e.FinalPayoutPerWorker))
+		sb.WriteString("\n")
 	}
-	fmt.Printf("SUPPORT\n")
+
+	sb.WriteString("SUPPORT\n")
 	for _, s := range c.SupportOut {
-		fmt.Printf("SUPPORT NAME: %s\n", s.Name)
-		fmt.Printf("HOURS: %.2f\n", s.Hours)
-		fmt.Printf("%% OF SUPPORT TIP POOL: %.2f\n", s.PercentageOfSupportTipPool)
-		fmt.Printf("TIPOUT FROM BAR: %.2f\n", s.TipoutFromBar)
-		fmt.Printf("TIPOUT FROM SERVERS: %.2f\n", s.TipoutFromServers)
-		fmt.Printf("TIPOUT FROM EVENTS: %.2f\n", s.TipoutFromEvents)
-		fmt.Printf("FINAL PAYOUT: %.2f\n", s.FinalPayout)
-		fmt.Printf("\n")
+		sb.WriteString(fmt.Sprintf("SUPPORT NAME: %s\n", s.Name))
+		sb.WriteString(fmt.Sprintf("HOURS: %.2f\n", s.Hours))
+		sb.WriteString(fmt.Sprintf("%% OF SUPPORT TIP POOL: %.2f\n", s.PercentageOfSupportTipPool))
+		sb.WriteString(fmt.Sprintf("TIPOUT FROM BAR: %.2f\n", s.TipoutFromBar))
+		sb.WriteString(fmt.Sprintf("TIPOUT FROM SERVERS: %.2f\n", s.TipoutFromServers))
+		sb.WriteString(fmt.Sprintf("TIPOUT FROM EVENTS: %.2f\n", s.TipoutFromEvents))
+		sb.WriteString(fmt.Sprintf("FINAL PAYOUT: %.2f\n", s.FinalPayout))
+		sb.WriteString("\n")
 	}
-	fmt.Printf("\n")
+
+	sb.WriteString("\n")
+
+	return sb.String()
+}
+
+func (c *Calculator) GetInputInfo() string {
+	var sb strings.Builder
+
+	sb.WriteString("ROSTER\n")
+	sb.WriteString("\n")
+	sb.WriteString("BAR:\n")
+	for _, bartender := range calc.BarTeamIn.Bartenders {
+		sb.WriteString(fmt.Sprintf("Name: %s\n", bartender.Name))
+		sb.WriteString(fmt.Sprintf("Hours: %f\n", bartender.Hours))
+		sb.WriteString("\n")
+	}
+	sb.WriteString("\n")
+	sb.WriteString("SERVERS:\n")
+	for _, server := range calc.ServersIn {
+		sb.WriteString(fmt.Sprintf("Name: %s\n", server.Name))
+		sb.WriteString(fmt.Sprintf("Owed To: %f\n", server.OwedTo))
+		sb.WriteString(fmt.Sprintf("Sales: %f\n", server.Sales))
+		sb.WriteString("\n")
+	}
+	sb.WriteString("\n")
+	sb.WriteString("EVENTS:\n")
+	for _, event := range calc.EventsIn {
+		sb.WriteString(fmt.Sprintf("Name: %s\n", event.Name))
+		sb.WriteString(fmt.Sprintf("Owed To: %f\n", event.OwedTo))
+		sb.WriteString(fmt.Sprintf("Sales: %f\n", event.Sales))
+		sb.WriteString(fmt.Sprintf("Split By: %d\n", event.SplitBy))
+		sb.WriteString("\n")
+	}
+	sb.WriteString("\n")
+	sb.WriteString("SUPPORT:\n")
+	for _, support := range calc.SupportIn {
+		sb.WriteString(fmt.Sprintf("Name: %s\n", support.Name))
+		sb.WriteString(fmt.Sprintf("Hours: %f\n", support.Hours))
+		sb.WriteString("\n")
+	}
+	sb.WriteString("\n")
+
+	return sb.String()
 }
 
 func (c *Calculator) SeedSampleData() {
@@ -296,7 +363,3 @@ func getSampleCalc() Calculator {
 	}
 	return calc
 }
-
-// func (c *Calculator) SaveJSONToFile() {
-
-// }

@@ -6,13 +6,12 @@ import (
 
 	"gioui.org/app"
 	"gioui.org/layout"
-	"gioui.org/unit"
 )
 
 type C = layout.Context
 type D = layout.Dimensions
 
-type ViewState int	
+type ViewState int
 
 const (
 	MainView ViewState = iota
@@ -25,10 +24,12 @@ var calc *Calculator
 func main() {
 	calc = new(Calculator)
 	calc.SeedSampleData()
+	calc.RunCalculationsPopulateOutputFields()
 
 	go func() {
 		w := new(app.Window)
-		w.Option(app.Title("TipOut Champ"), app.Size(unit.Dp(400), unit.Dp(600)))
+		// w.Option(app.Title("TipOut Champ"), app.Size(unit.Dp(400), unit.Dp(600)))
+		w.Option(app.Title("TipOut Champ"))
 
 		if err := loop(w); err != nil {
 			log.Fatal(err)
