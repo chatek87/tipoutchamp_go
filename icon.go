@@ -24,24 +24,31 @@ const (
 	Support
 )
 
-func drawStaffIcon(th *material.Theme, name string, p Position) widget.Clickable {
+func GenerateClickableForStaffMember(th *material.Theme, staff StaffInput) widget.Clickable {
 	click := widget.Clickable{}
-	button := material.Button(th, &click, name)
-	button.Background = getPositionColor(p)
+	button := material.Button(th, &click, staff.GetFirstInitial())
+	button.Background = staff.GetPositionColor()
 	return click
 }
 
-func getPositionColor(p Position) color.NRGBA {
-	switch p {
-	case Bartender:
-		return color.NRGBA{R: 255, G: 0, B: 0, A: 255} // Red for Bartenders
-	case Server:
-		return color.NRGBA{G: 255, B: 0, A: 255} // Green for Servers
-	case Event:
-		return color.NRGBA{R: 255, G: 165, B: 0, A: 255} // Orange for Events
-	case Support:
-		return color.NRGBA{B: 255, A: 255} // Blue for Support
-	default:
-		return color.NRGBA{A: 255} // Transparent for unknown positions
+func renderStaffIcons(gtx C, th *material.Theme, calc *Calculator, staffIcons []widget.Clickable) []widget.Clickable {
+	// var staffIcons []widget.Clickable
+
+	for _, b := range calc.BarTeamIn.Bartenders {
+		click := GenerateClickableForStaffMember(th, &b)
+		staffIcons = append(staffIcons, click)
 	}
+	for _, s := range calc.ServersIn {
+		click := GenerateClickableForStaffMember(th, &s)
+		staffIcons = append(staffIcons, click)
+	}
+	for _, e := range calc.EventsIn {
+		click := GenerateClickableForStaffMember(th, &e)
+		staffIcons = append(staffIcons, click)
+	}
+	for _, s := range calc.SupportIn {
+		click := GenerateClickableForStaffMember(th, &s)
+		staffIcons = append(staffIcons, click)
+	}
+	return staffIcons
 }

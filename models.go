@@ -1,23 +1,49 @@
 package main
 
-// input models
-type BartenderIn struct {
-	Name  string
-	Hours float64
+import "image/color"
+
+type StaffInput interface {
+	GetFirstInitial() string
+	GetPositionColor() color.NRGBA
 }
 
+// input models
 type BarTeamIn struct {
 	Bartenders []BartenderIn
 	OwedTo     float64
 	Sales      float64
 }
 
+// bar
+type BartenderIn struct {
+	Name  string
+	Hours float64
+}
+
+func (b *BartenderIn) GetFirstInitial() string {
+	fi := string(b.Name[0])
+	return fi
+}
+func (b *BartenderIn) GetPositionColor() color.NRGBA {
+	return color.NRGBA{R: 255, G: 0, B: 0, A: 255} // Red for Bartenders
+}
+
+// server
 type ServerIn struct {
 	Name   string
 	OwedTo float64
 	Sales  float64
 }
 
+func (s *ServerIn) GetFirstInitial() string {
+	fi := string(s.Name[0])
+	return fi
+}
+func (s *ServerIn) GetPositionColor() color.NRGBA {
+	return color.NRGBA{G: 255, B: 0, A: 255} // Green for Servers
+}
+
+// event
 type EventIn struct {
 	Name    string
 	OwedTo  float64
@@ -25,9 +51,26 @@ type EventIn struct {
 	SplitBy int
 }
 
+func (e *EventIn) GetFirstInitial() string {
+	fi := string(e.Name[0])
+	return fi
+}
+func (e *EventIn) GetPositionColor() color.NRGBA {
+	return color.NRGBA{R: 255, G: 165, B: 0, A: 255} // Orange for Events
+}
+
+// support
 type SupportIn struct {
 	Name  string
 	Hours float64
+}
+
+func (s *SupportIn) GetFirstInitial() string {
+	fi := string(s.Name[0])
+	return fi
+}
+func (s *SupportIn) GetPositionColor() color.NRGBA {
+	return color.NRGBA{B: 255, A: 255} // Blue for Support
 }
 
 // output models ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
