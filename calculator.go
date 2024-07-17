@@ -363,3 +363,9 @@ func getSampleCalc() Calculator {
 	}
 	return calc
 }
+
+func (c *Calculator) GetRosterCount() int {
+	count := len(c.BarTeamIn.Bartenders) + len(c.ServersIn) + len(c.EventsIn) + len(c.SupportIn)
+	
+	return count
+}

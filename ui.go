@@ -7,7 +7,6 @@ import (
 	"gioui.org/app"
 	"gioui.org/layout"
 	"gioui.org/op"
-	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
 )
@@ -22,6 +21,7 @@ func loop(w *app.Window) error {
 	var addBartenderHours widget.Editor
 	var submitButton widget.Clickable
 	var backButton widget.Clickable
+	var staffIcons []widget.Clickable
 
 	// event loop
 	for {
@@ -39,7 +39,7 @@ func loop(w *app.Window) error {
 
 			switch currentState {
 			case MainView:
-				renderMainView(gtx, th, &addBartenderBtn)
+				renderMainView(gtx, th, &addBartenderBtn, staffIcons)
 			case BartenderInputView:
 				fmt.Println(currentState)
 				renderBartenderInputView(gtx, th, &addBartenderName, &addBartenderHours, &submitButton, &backButton)
@@ -50,41 +50,40 @@ func loop(w *app.Window) error {
 	}
 }
 
-func renderMainView(gtx layout.Context, th *material.Theme, addBartenderBtn *widget.Clickable) layout.Dimensions {	
-	flex := layout.Flex{Axis: layout.Vertical}.Layout(gtx,
-		layout.Rigid(func(gtx C) D {
-			title := material.H1(th, "TipOut Champ")
-			return title.Layout(gtx)
-		}),
+func renderMainView(gtx C, th *material.Theme, addBartenderBtn *widget.Clickable, staffIcons []widget.Clickable) D {
+	flex := layout.Flex{
+		Axis:    layout.Vertical,
+		Spacing: layout.SpaceEvenly,
+	}.Layout(gtx,
+		layout.Rigid(
+			func(gtx C) D {
+				title := material.H1(th, "TipOut Champ")
+				return title.Layout(gtx)
+			}),
 		layout.Rigid(func(gtx C) D {
 			return layout.Spacer{Height: 20}.Layout(gtx)
 		}),
 		layout.Rigid(material.Button(th, addBartenderBtn, "Add Bartender").Layout),
 		layout.Rigid(func(gtx C) D {
-			// TODO: modify this func to print all the details of the staff input models w/ a clickable icon for editing
-			// for _, bartender := range calc.BarTeamIn.Bartenders {
-			// 	drawStaffIcon(bartender.Name, Bartender)
-			// }
-			// for _, server := range calc.ServersIn {
-			// 	drawStaffIcon(server.Name, Server)
-
-			// }
-			// for _, event := range calc.EventsIn {
-			// 	drawStaffIcon(event.Name, Event)
-
-			// }
-			// for _, support := range calc.SupportIn {
-			// 	drawStaffIcon(support.Name, Support)
-
-			// }
-			return material.Label(th, unit.Sp(12), "poop").Layout(gtx)
+			if len(staffIcons) == 0 {
+				for _, b := range calc.BarTeamIn.Bartenders {
+					click := widget.Clickable{}
+					staffIcons = append(staffIcons, click)
+					fmt.Printf("%s\n", b.Name)
+				}
+			}
+			list := layout.List{Axis: layout.Horizontal}
+			return list.Layout(gtx, len(staffIcons), func(gtx C, index int) D {
+				icon := staffIcons[index]
+				return material.Button(th, &icon, "Bartender name").Layout(gtx)
+			})
 		}),
 	)
 
 	return flex
 }
 
-func renderBartenderInputView(gtx layout.Context, th *material.Theme, addBartenderName *widget.Editor, addBartenderHours *widget.Editor, submitButton *widget.Clickable, backButton *widget.Clickable) layout.Dimensions {
+func renderBartenderInputView(gtx C, th *material.Theme, addBartenderName *widget.Editor, addBartenderHours *widget.Editor, submitButton *widget.Clickable, backButton *widget.Clickable) D {
 	if backButton.Clicked(gtx) {
 		currentState = MainView
 	}
@@ -94,7 +93,7 @@ func renderBartenderInputView(gtx layout.Context, th *material.Theme, addBartend
 		b := new(BartenderIn)
 		b.Name = addBartenderName.Text()
 		hoursText := addBartenderHours.Text()
-		
+
 		hours, err := strconv.ParseFloat(hoursText, 64)
 		if err != nil {
 			fmt.Printf("Error converting hours to float: %v\n", err)
@@ -106,10 +105,10 @@ func renderBartenderInputView(gtx layout.Context, th *material.Theme, addBartend
 		for _, b := range calc.BarTeamIn.Bartenders {
 			fmt.Printf(b.Name)
 		}
-		currentState = MainView 
-		} else if backButton.Clicked(gtx) {
-			currentState = MainView 
-		}
+		currentState = MainView
+	} else if backButton.Clicked(gtx) {
+		currentState = MainView
+	}
 	flex := layout.Flex{Axis: layout.Vertical}.Layout(gtx,
 		layout.Rigid(func(gtx C) D {
 			return material.Editor(th, addBartenderName, "Bartender Name").Layout(gtx)
@@ -119,6 +118,6 @@ func renderBartenderInputView(gtx layout.Context, th *material.Theme, addBartend
 		}),
 		layout.Rigid(material.Button(th, submitButton, "Submit").Layout),
 		layout.Rigid(material.Button(th, backButton, "Go Back").Layout),
-	)		
-		return flex
+	)
+	return flex
 }

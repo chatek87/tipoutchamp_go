@@ -2,6 +2,9 @@ package main
 
 import (
 	"image/color"
+
+	"gioui.org/widget"
+	"gioui.org/widget/material"
 )
 
 // i feel like encapsulating this stuff is unnecessary since we are
@@ -21,17 +24,24 @@ const (
 	Support
 )
 
-func getPositionColor(p Position) color.RGBA {
+func drawStaffIcon(th *material.Theme, name string, p Position) widget.Clickable {
+	click := widget.Clickable{}
+	button := material.Button(th, &click, name)
+	button.Background = getPositionColor(p)
+	return click
+}
+
+func getPositionColor(p Position) color.NRGBA {
 	switch p {
 	case Bartender:
-		return color.RGBA{R: 255, G: 0, B: 0, A: 255} // Red for Bartenders
+		return color.NRGBA{R: 255, G: 0, B: 0, A: 255} // Red for Bartenders
 	case Server:
-		return color.RGBA{G: 255, B: 0, A: 255} // Green for Servers
+		return color.NRGBA{G: 255, B: 0, A: 255} // Green for Servers
 	case Event:
-		return color.RGBA{R: 255, G: 165, B: 0, A: 255} // Orange for Events
+		return color.NRGBA{R: 255, G: 165, B: 0, A: 255} // Orange for Events
 	case Support:
-		return color.RGBA{B: 255, A: 255} // Blue for Support
+		return color.NRGBA{B: 255, A: 255} // Blue for Support
 	default:
-		return color.RGBA{A: 255} // Transparent for unknown positions
+		return color.NRGBA{A: 255} // Transparent for unknown positions
 	}
 }
