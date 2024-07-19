@@ -21,7 +21,7 @@ func loop(w *app.Window) error {
 	var addBartenderHours widget.Editor
 	var submitButton widget.Clickable
 	var backButton widget.Clickable
-	var staffIcons []widget.Clickable
+	var staffIcons []StaffIcon
 
 	// event loop
 	for {
@@ -39,7 +39,7 @@ func loop(w *app.Window) error {
 
 			switch currentState {
 			case MainView:
-				renderMainView(gtx, th, &addBartenderBtn, staffIcons)
+				renderMainView(gtx, th, &addBartenderBtn, &staffIcons)
 			case BartenderInputView:
 				fmt.Println(currentState)
 				renderBartenderInputView(gtx, th, &addBartenderName, &addBartenderHours, &submitButton, &backButton)
@@ -50,7 +50,7 @@ func loop(w *app.Window) error {
 	}
 }
 
-func renderMainView(gtx C, th *material.Theme, addBartenderBtn *widget.Clickable, staffIcons []widget.Clickable) D {
+func renderMainView(gtx C, th *material.Theme, addBartenderBtn *widget.Clickable, staffIcons *[]widget.Clickable) D {
 	flex := layout.Flex{
 		Axis:    layout.Vertical,
 		Spacing: layout.SpaceEvenly,
@@ -65,18 +65,18 @@ func renderMainView(gtx C, th *material.Theme, addBartenderBtn *widget.Clickable
 		}),
 		layout.Rigid(material.Button(th, addBartenderBtn, "Add Bartender").Layout),
 		layout.Rigid(func(gtx C) D {
-			if len(staffIcons) == 0 {
-				for _, b := range calc.BarTeamIn.Bartenders {
-					click := widget.Clickable{}
-					staffIcons = append(staffIcons, click)
-					fmt.Printf("%s\n", b.Name)
-				}
-			}
-			list := layout.List{Axis: layout.Horizontal}
-			return list.Layout(gtx, len(staffIcons), func(gtx C, index int) D {
-				icon := staffIcons[index]
-				return material.Button(th, &icon, "Bartender name").Layout(gtx)
-			})
+			// renderStaffIcons()
+			// here we need to 1) clear staffIcons slice
+			// 2) populate staffIcons based on calc contents
+			// 3) use the clickables we have generated to draw the buttons (use material.Button() to return a []material.ButtonStyle)
+			// 4) somehow pass an identifier (either pointer or index) of each element so that when we click a button, it knows which element of the slice is associated w/ that button
+			// 5) wrap all of these buttons in a layout.List and lay them out
+
+			// list := layout.List{Axis: layout.Horizontal}
+			// return list.Layout(gtx, len(*staffIcons), func(gtx C, index int) D {
+			// 	icon := staffIcons[index]
+			// 	return material.Button(th, &icon, "Bartender name").Layout(gtx)
+			// })
 		}),
 	)
 
