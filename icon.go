@@ -1,6 +1,8 @@
 package main
 
 import (
+	"image/color"
+
 	"gioui.org/widget"
 	"gioui.org/widget/material"
 )
@@ -8,30 +10,45 @@ import (
 type StaffIcon struct {
 	Clickable widget.Clickable
 	Member    *StaffInput
+	Color     color.NRGBA
+	Text      string
 }
 
-func GetStaffIcon(staff StaffInput) StaffIcon {
+func getStaffIcon(staff StaffInput) StaffIcon {
 	v := new(StaffIcon)
 	v.Clickable = widget.Clickable{}
 	v.Member = &staff
+	v.Color = staff.GetPositionColor()
+	v.Text = staff.GetFirstInitial()
 	return *v
 }
 
 func populateStaffIcons(th *material.Theme, calc *Calculator, staffIcons *[]StaffIcon) {
+	*staffIcons = []StaffIcon{}
 	for _, b := range calc.BarTeamIn.Bartenders {
-		click := GetStaffIcon(&b) // Directly passing the address of b, assuming BartenderIn implements StaffInput
-		*staffIcons = append(*staffIcons, click)
+		s := getStaffIcon(&b)
+		*staffIcons = append(*staffIcons, s)
 	}
 	for _, s := range calc.ServersIn {
-		click := GetStaffIcon(&s) // Directly passing the address of s, assuming ServerIn implements StaffInput
-		*staffIcons = append(*staffIcons, click)
+		s := getStaffIcon(&s)
+		*staffIcons = append(*staffIcons, s)
 	}
 	for _, e := range calc.EventsIn {
-		click := GetStaffIcon(&e) // Directly passing the address of e, assuming EventIn implements StaffInput
-		*staffIcons = append(*staffIcons, click)
+		s := getStaffIcon(&e)
+		*staffIcons = append(*staffIcons, s)
 	}
 	for _, s := range calc.SupportIn {
-		click := GetStaffIcon(&s) // Directly passing the address of s, assuming SupportIn implements StaffInput
-		*staffIcons = append(*staffIcons, click)
+		s := getStaffIcon(&s)
+		*staffIcons = append(*staffIcons, s)
 	}
+}
+
+func renderStaffIconButtons(th *material.Theme, s *[]StaffIcon) []material.ButtonStyle {
+	b := []material.ButtonStyle{}
+	for _, icon := range *s {
+		btn := material.Button(th, &icon.Clickable, icon.Text)
+		btn.Background = icon.Color
+		b = append(b, btn)
+	}
+	return b
 }

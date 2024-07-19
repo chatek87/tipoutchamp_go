@@ -50,7 +50,7 @@ func loop(w *app.Window) error {
 	}
 }
 
-func renderMainView(gtx C, th *material.Theme, addBartenderBtn *widget.Clickable, staffIcons *[]widget.Clickable) D {
+func renderMainView(gtx C, th *material.Theme, addBartenderBtn *widget.Clickable, staffIcons *[]StaffIcon) D {
 	flex := layout.Flex{
 		Axis:    layout.Vertical,
 		Spacing: layout.SpaceEvenly,
@@ -65,17 +65,19 @@ func renderMainView(gtx C, th *material.Theme, addBartenderBtn *widget.Clickable
 		}),
 		layout.Rigid(material.Button(th, addBartenderBtn, "Add Bartender").Layout),
 		layout.Rigid(func(gtx C) D {
-			// renderStaffIcons()
-			// here we need to 1) clear staffIcons slice
-			// 2) populate staffIcons based on calc contents
+			// here we need to 1) clear staffIcons slice --> handled in populateStaffIcons()
+			// 2) populate staffIcons based on calc contents --> handled in populateStaffIcons()
+			populateStaffIcons(th, calc, staffIcons)
 			// 3) use the clickables we have generated to draw the buttons (use material.Button() to return a []material.ButtonStyle)
+			iconButtons := renderStaffIconButtons(th, staffIcons)
+			
 			// 4) somehow pass an identifier (either pointer or index) of each element so that when we click a button, it knows which element of the slice is associated w/ that button
 			// 5) wrap all of these buttons in a layout.List and lay them out
 
 			// list := layout.List{Axis: layout.Horizontal}
 			// return list.Layout(gtx, len(*staffIcons), func(gtx C, index int) D {
 			// 	icon := staffIcons[index]
-			// 	return material.Button(th, &icon, "Bartender name").Layout(gtx)
+				// return material.Button(th, &icon, "Bartender name").Layout(gtx)
 			// })
 		}),
 	)
