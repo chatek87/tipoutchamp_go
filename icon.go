@@ -12,6 +12,7 @@ type StaffIcon struct {
 	Member    *StaffInput
 	Color     color.NRGBA
 	Text      string
+	Role      Role
 }
 
 func getStaffIcon(staff StaffInput) StaffIcon {
@@ -20,10 +21,11 @@ func getStaffIcon(staff StaffInput) StaffIcon {
 	v.Member = &staff
 	v.Color = staff.GetPositionColor()
 	v.Text = staff.GetFirstInitial()
+	v.Role = staff.GetRole()
 	return *v
 }
 
-func populateStaffIcons(th *material.Theme, calc *Calculator, staffIcons *[]StaffIcon) {
+func populateStaffIcons(calc *Calculator, staffIcons *[]StaffIcon) {
 	*staffIcons = []StaffIcon{}
 	for _, b := range calc.BarTeamIn.Bartenders {
 		s := getStaffIcon(&b)

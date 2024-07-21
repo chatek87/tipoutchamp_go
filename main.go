@@ -16,6 +16,7 @@ type ViewState int
 const (
 	MainView ViewState = iota
 	BartenderInputView
+	StaffMemberDetailView
 )
 
 var currentState ViewState = MainView
@@ -28,7 +29,6 @@ func main() {
 
 	go func() {
 		w := new(app.Window)
-		// w.Option(app.Title("TipOut Champ"), app.Size(unit.Dp(400), unit.Dp(600)))
 		w.Option(app.Title("TipOut Champ"))
 
 		if err := loop(w); err != nil {

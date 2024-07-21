@@ -2,9 +2,19 @@ package main
 
 import "image/color"
 
+type Role int
+
+const (
+	Bartender Role = iota
+	Server
+	Event
+	Support
+)
+
 type StaffInput interface {
 	GetFirstInitial() string
 	GetPositionColor() color.NRGBA
+	GetRole() Role
 }
 
 // input models
@@ -27,6 +37,9 @@ func (b *BartenderIn) GetFirstInitial() string {
 func (b *BartenderIn) GetPositionColor() color.NRGBA {
 	return color.NRGBA{R: 255, G: 0, B: 0, A: 255} // Red for Bartenders
 }
+func (b *BartenderIn) GetRole() Role {
+	return Bartender
+}
 
 // server
 type ServerIn struct {
@@ -41,6 +54,9 @@ func (s *ServerIn) GetFirstInitial() string {
 }
 func (s *ServerIn) GetPositionColor() color.NRGBA {
 	return color.NRGBA{G: 255, B: 0, A: 255} // Green for Servers
+}
+func (s *ServerIn) GetRole() Role {
+	return Server
 }
 
 // event
@@ -58,6 +74,9 @@ func (e *EventIn) GetFirstInitial() string {
 func (e *EventIn) GetPositionColor() color.NRGBA {
 	return color.NRGBA{R: 255, G: 165, B: 0, A: 255} // Orange for Events
 }
+func (e *EventIn) GetRole() Role {
+	return Event
+}
 
 // support
 type SupportIn struct {
@@ -71,6 +90,9 @@ func (s *SupportIn) GetFirstInitial() string {
 }
 func (s *SupportIn) GetPositionColor() color.NRGBA {
 	return color.NRGBA{B: 255, A: 255} // Blue for Support
+}
+func (s *SupportIn) GetRole() Role {
+	return Support
 }
 
 // output models ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

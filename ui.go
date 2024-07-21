@@ -37,6 +37,13 @@ func loop(w *app.Window) error {
 				fmt.Println(addBartenderBtn.Clicked(gtx)) // Should print true when the button is clicked
 			}
 
+			for _, member := range staffIcons {
+				if member.Clickable.Clicked(gtx) {
+					currentState = StaffMemberDetailView
+					renderStaffDetailView(member.Role)
+				}
+			}
+
 			switch currentState {
 			case MainView:
 				renderMainView(gtx, th, &addBartenderBtn, &staffIcons)
@@ -67,22 +74,33 @@ func renderMainView(gtx C, th *material.Theme, addBartenderBtn *widget.Clickable
 		layout.Rigid(func(gtx C) D {
 			// here we need to 1) clear staffIcons slice --> handled in populateStaffIcons()
 			// 2) populate staffIcons based on calc contents --> handled in populateStaffIcons()
-			populateStaffIcons(th, calc, staffIcons)
+			populateStaffIcons(calc, staffIcons)
 			// 3) use the clickables we have generated to draw the buttons (use material.Button() to return a []material.ButtonStyle)
 			iconButtons := renderStaffIconButtons(th, staffIcons)
-			
 			// 4) somehow pass an identifier (either pointer or index) of each element so that when we click a button, it knows which element of the slice is associated w/ that button
-			// 5) wrap all of these buttons in a layout.List and lay them out
 
-			// list := layout.List{Axis: layout.Horizontal}
-			// return list.Layout(gtx, len(*staffIcons), func(gtx C, index int) D {
-			// 	icon := staffIcons[index]
-				// return material.Button(th, &icon, "Bartender name").Layout(gtx)
-			// })
+			// 5) wrap all of these buttons in a layout.List and lay them out
+			list := layout.List{Axis: layout.Horizontal}
+			return list.Layout(gtx, len(iconButtons)*2-1, func(gtx C, index int) D {
+				if index%2 == 1 {
+					return layout.Spacer{Width: 10}.Layout(gtx) // Adjust the width as needed
+				}
+				return iconButtons[index/2].Layout(gtx)
+			})
 		}),
 	)
 
 	return flex
+}
+
+func renderStaffDetailView(role Role) {
+	//TODO: render each w/ editors for the appropriate fields
+	switch role {
+	case Bartender:
+	case Server:
+	case Event:
+	case Support:
+	}
 }
 
 func renderBartenderInputView(gtx C, th *material.Theme, addBartenderName *widget.Editor, addBartenderHours *widget.Editor, submitButton *widget.Clickable, backButton *widget.Clickable) D {
